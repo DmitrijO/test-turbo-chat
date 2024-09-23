@@ -14,8 +14,8 @@ import { ProfileModule } from './profile/profile.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      // host: 'db',
-      host: 'localhost',
+      host: 'db',
+      // host: 'localhost',
       port: 5432,
       username: 'user',
       password: 'password',
