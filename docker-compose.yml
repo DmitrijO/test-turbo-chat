@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: turbochat
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  server:
+    build: ./apps/server
+    command: npm run dev
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/turbochat
+      - JWT_SECRET=your_jwt_secret_value_here
+      - DIRECTUS_ADMIN_URL=http://directus:8055
+      - DIRECTUS_ADMIN_EMAIL=admin@example.com
+      - DIRECTUS_ADMIN_PASSWORD=password
+      - STRIPE_SECRET_KEY=sk_test_51PuqvLH78kIalckfsWs446PHQUdYnRetflqgHqZBmNThUYOoZaO4cSWNZsekc2BzcxMN8R0OmTDD6mmhpzoeMxGO002KTJIuib
+    depends_on:
+      - db
+
+  web:
+    build: ./apps/web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  directus:
+    image: directus/directus:latest
+    environment:
+      KEY: 'mydirectuskey'
+      SECRET: 'mydirectussecret'
+      ADMIN_EMAIL: 'admin@example.com'
+      ADMIN_PASSWORD: 'password'
+      DATABASE_CLIENT: 'pg'
+      DATABASE_HOST: 'db'
+      DATABASE_PORT: 5432
+      DATABASE_NAME: 'directus'
+      DATABASE_USER: 'postgres'
+      DATABASE_PASSWORD: 'postgres'
+    ports:
+      - 8055:8055
+    depends_on:
+      - db
+      
+
+volumes:
+  postgres-data:
